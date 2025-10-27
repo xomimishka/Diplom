@@ -1,0 +1,122 @@
+@import "./variables.scss";
+
+.block-link {
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.input-container,
+.link-wrapper {
+    position: relative;
+}
+
+.clear-btn {
+    // Не трогать особенный :)
+    position: absolute;
+    right: 20px;
+    top: 35%;
+    background: none;
+    border: none;
+    cursor: pointer;
+
+    &::after {
+        content: "Очистить";
+        position: absolute;
+        top: -25px; // расстояние над кнопкой
+        left: 100%;
+        transform: translateX(-100%);
+
+        background: $color-background-dark;
+        color: $color-white;
+        font-size: $text-little;
+        font-family: $font-main;
+        font-weight: $text-weight-little;
+
+        padding: 3px 5px;
+        border-radius: 2px;
+        opacity: 0;
+
+        white-space: nowrap;
+        transition: opacity 0.1s ease;
+    }
+
+    &:hover::after {
+        opacity: 1;
+    }
+
+    &:hover img {
+        filter: $color-primary-filter;
+    }
+}
+
+.input-shortening {
+    @extend %input-base;
+    width: 500px;
+}
+
+.input-login {
+    @extend %input-base;
+    width: 325px;
+}
+
+.button-shortening {
+    // Кнопка - Сократить
+    width: 150px;
+    height: 40px;
+
+    color: $color-white;
+    background-color: $color-grey;
+    font-size: $text-primary;
+
+    border: none;
+    border-radius: 8px;
+
+    cursor: auto;
+
+    &.enabled {
+        background-color: $color-primary;
+        cursor: pointer;
+    }
+
+    &:hover,
+    &:active {
+        color: $color-white;
+    }
+}
+
+.dropdown-menu {
+    // Дополнительные опции
+    position: absolute;
+    left: 0;
+    width: 540px;
+
+    background: $color-white;
+
+    border: 1px solid $color-grey;
+    border-top: none;
+    border-radius: 0 0 2px 2px;
+    box-shadow: 0 1px 5px $color-shadow;
+
+    z-index: 100;
+    padding: 20px 20px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+
+    label {
+        display: flex;
+        align-items: center;
+
+        gap: 10px;
+
+        cursor: pointer;
+        font-size: $text-average;
+    }
+
+    input[type="radio"] {
+        display: none;
+    }
+}

@@ -1,0 +1,139 @@
+@import "./variables.scss";
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: $font-main;
+}
+
+.root {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: $padding-page;
+}
+
+// Текст
+.text-little-grey {
+    color: $color-grey;
+    font-size: $text-little;
+}
+
+.text-average-grey {
+    color: $color-grey;
+    font-size: $text-average;
+}
+
+.text-primary-grey {
+    color: $color-grey;
+    font-size: $text-primary;
+}
+
+.text-average-black {
+    color: $color-blaсk;
+    font-size: $text-average;
+}
+
+.text-primary-black {
+    color: $color-blaсk;
+    font-size: $text-primary;
+}
+
+.text-primary {
+    color: $color-primary;
+    font-size: $text-primary;
+}
+
+.weight-400 {
+    font-weight: $text-weight-primary;
+}
+
+.weight-300 {
+    font-weight: $text-weight-little;
+}
+
+// Кнопки
+button {
+    @extend %button-base;
+}
+
+a {
+    @extend %button-base;
+
+    text-decoration: none;
+    color: $color-blaсk;
+
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    &:hover,
+    &:active {
+        color: $color-primary;
+    }
+}
+
+%tooltip-base {
+    content: attr(data-tooltip);
+
+    position: absolute;
+
+    background: $color-background-dark;
+    color: $color-white;
+    font-size: $text-little;
+    font-weight: $text-weight-little;
+
+    padding: 3px 5px;
+    border-radius: $border-radius-small;
+    opacity: 0;
+    white-space: nowrap;
+    transition: opacity $transition-fast;
+    z-index: 10;
+}
+
+.btn {
+    // Подпись кнопки
+    position: relative;
+
+    &::after {
+        @extend %tooltip-base;
+        bottom: -25px;
+        right: 0;
+    }
+
+    &--top::after {
+        top: -25px;
+        bottom: auto;
+        right: 0;
+    }
+
+    &:hover::after {
+        opacity: 1;
+    }
+}
+
+// Заголовки
+h1 {
+    @extend %title;
+    font-size: $text-title-big;
+}
+
+h2 {
+    @extend %title;
+    font-size: $text-title-little;
+}
+
+.signature {
+    font-size: $text-primary;
+    font-weight: $text-weight-little;
+    color: $color-grey;
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+hr {
+    margin-top: 30px;
+    border: none;
+    border-top: 1px solid $color-grey-header;
+}

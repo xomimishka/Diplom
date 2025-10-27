@@ -1,0 +1,142 @@
+@import "./variables.scss";
+
+#header {
+    // Делаем хедер поверх затемнения
+    position: relative;
+    background-color: $color-white;
+    z-index: 300;
+}
+
+#login-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4); // полупрозрачное затемнение
+    z-index: 150;
+}
+
+#login {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    z-index: 200;
+
+    >div {
+        background-color: $color-white;
+        border: 1px solid $color-grey;
+        border-radius: 8px;
+        padding: 60px 40px;
+        width: 580px;
+    }
+}
+
+.block-login {
+    // Поля логин, пароль и кнопка
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+.input-login {
+    width: 325px;
+    height: 40px;
+
+    border: 1px solid $color-grey;
+    border-radius: 8px;
+    padding: 0 20px 0 20px;
+
+    font-size: $text-average;
+    font-weight: $text-weight-little;
+
+    @extend %input-base;
+
+    &:focus {
+        outline: none; // убирает синюю стандартную обводку браузера
+    }
+}
+
+.input-error {
+    border: 1px solid red;
+    color: red;
+}
+
+.button-login {
+    width: 325px;
+    height: 40px;
+    color: $color-white;
+    background-color: $color-primary;
+    border: none;
+    border-radius: 8px;
+
+    font-family: $font-main;
+    font-size: $text-primary;
+
+    &.enabled {
+        cursor: pointer;
+    }
+
+    &:hover,
+    &:active {
+        color: $color-white;
+    }
+}
+
+.button-website {
+    // Кнопки гугл
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 325px;
+    height: 40px;
+    font-size: $text-average;
+    border: 1px solid $color-grey;
+    border-radius: 8px;
+    gap: 10px;
+
+    img {
+        width: 20px;
+        height: 20px;
+    }
+
+    &:hover,
+    &:active {
+        color: $color-blaсk;
+        border: 1px solid $color-primary;
+        img {
+            filter: none;
+        }
+    }
+
+}
+
+.divider {
+    // Черта и текст - ИЛИ
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: $color-grey;
+    margin: 50px auto;
+    width: 345px;
+
+    &::before,
+    &::after {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: $color-grey;
+        margin: 0 10px;
+    }
+}
+
+.top {
+    // Нужен отступ в Регистрации между кнопко Зарегистрироваться и - Уже есть аккаунт?
+    margin-top: 50px;
+}
+
+.weight-400 {
+    font-weight: $text-weight-primary;
+}

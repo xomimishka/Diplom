@@ -1,0 +1,119 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+
+// Основная палитра
+$color-primary: #638BC8;
+$color-primary-filter: brightness(0) saturate(100%) invert(56%) sepia(30%) saturate(800%) hue-rotate(189deg) brightness(94%) contrast(93%);
+$color-filter-white: invert(100%) sepia(0%) saturate(0%) hue-rotate(0deg);
+$color-grey: #8C8C8C;
+$color-grey-header: #C0C0C0;
+$color-background-dark-grey: rgba(0, 0, 0, 0.3);
+$color-background-dark: #484848;
+$color-blaсk: black;
+$color-white: white;
+$color-shadow: rgba(0, 0, 0, 0.1);
+
+// Шрифт
+$font-main: "Inter", sans-serif;
+
+// Размер шрифтов
+$text-primary: 16px;
+$text-average: 14px;
+$text-little: 12px;
+
+$text-title-big: 32px;
+$text-title-little: 24px;
+
+$text-weight-big: 500;
+$text-weight-primary: 400;
+$text-weight-little: 300;
+
+// Интервалы
+$padding-header: 0.5% 5%;
+$padding-page: 100px 5% 60px 5%;
+$margin-title: 0 0 20px 0;
+
+// Добавить эти переменные:
+$border-radius: 8px;
+$border-radius-small: 2px;
+$transition-fast: 0.1s ease;
+$shadow-default: 0 1px 5px $color-shadow;
+
+// Цвета состояний
+$color-hover: $color-primary;
+$color-active: $color-primary;
+
+// Размеры элементов
+$input-height: 40px;
+$button-height: 40px;
+
+// В variables.scss:
+$spacing-xs: 5px;
+$spacing-sm: 10px;
+$spacing-md: 20px;
+$spacing-lg: 30px;
+$spacing-xl: 50px;
+
+@mixin dropdown-menu($position) {
+    position: absolute;
+    background: $color-white;
+    border: 1px solid $color-grey;
+    border-radius: $border-radius-small;
+    box-shadow: $shadow-default;
+    z-index: 100;
+    padding: 20px 100px 10px 20px;
+    width: auto;
+    min-width: min-content;
+    white-space: nowrap;
+
+    @if $position ==bottom {
+        top: 100%;
+        border-top: none;
+        border-radius: 0 0 $border-radius-small $border-radius-small;
+    }
+
+    @else if $position ==top {
+        bottom: 100%;
+        border-radius: $border-radius-small $border-radius-small $border-radius-small $border-radius-small;
+    }
+}
+
+%button-base {
+    background: none;
+    border: none;
+    cursor: pointer;
+
+    &:hover,
+    &:active {
+        color: $color-primary;
+    }
+
+    &:hover img,
+    &:active img,
+    &.active img {
+        filter: $color-primary-filter;
+    }
+}
+
+%title {
+    margin: $margin-title;
+    font-weight: $text-weight-primary;
+    text-align: center;
+}
+
+%input-base {
+    height: $input-height;
+    border: 1px solid $color-grey;
+    border-radius: $border-radius;
+    padding: 0 $spacing-md;
+    font-family: $font-main;
+    font-size: $text-average;
+    font-weight: $text-weight-little;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    &:focus {
+        outline: none;
+    }
+}

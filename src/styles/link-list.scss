@@ -1,0 +1,174 @@
+@import "./variables.scss";
+
+#link-list {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    border: 1px solid $color-grey-header;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px auto 0 auto;
+
+    li {
+        list-style: none;
+        width: 100%;
+        position: relative;
+        
+        &:hover {
+            .icons.hidden,
+            .button-right.hidden {
+                opacity: 1;
+                visibility: visible;
+            }
+        }
+    }
+}
+
+.link-list-guest {
+    width: 660px;
+}
+
+.link-list-home {
+    width: 700px;
+}
+
+.block-link {
+    // Весь блок ссылки
+    position: relative;
+    display: flex;
+    width: 100%;
+    box-sizing: border-box;
+    justify-content: flex-start;
+}
+
+.block-left {
+    // Левая часть блока
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-align: left;
+}
+
+.long-url {
+    // Короткая ссылка/Название ссылки
+    word-break: break-all;
+    width: 90%;
+}
+
+.qr {
+    width: 100px;
+    height: 100px;
+
+    &:hover,
+    &:active {
+        cursor: pointer;
+    }
+}
+
+.block-title {
+    // Собирает информацию о ссылке построчно и даёт интервал между ними 5px
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.button-right {
+    // Кнопки справа - Удалить и Статистика
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-end;
+    
+    // Анимация появления
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+    
+    &.hidden {
+        opacity: 0;
+        visibility: hidden;
+    }
+    
+    &.visible {
+        opacity: 1;
+        visibility: visible;
+    }
+}
+
+.statistics {
+    @extend %button-base;
+    color: $color-grey;
+    font-size: $text-little;
+
+    img {
+        margin-left: 5px;
+    }
+}
+
+.icons {
+    display: flex;
+    gap: 10px;
+    
+    // Анимация появления
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+    
+    &.hidden {
+        opacity: 0;
+        visibility: hidden;
+    }
+    
+    &.visible {
+        opacity: 1;
+        visibility: visible;
+    }
+}
+
+// Нужно для кнопки - Поделиться ссылкой
+.share-container {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-share-menu {
+    @include dropdown-menu(top);
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-bottom: 5px;
+
+    button {
+        font-size: $text-average;
+        display: flex;
+        align-items: center;
+    }
+}
+
+.copy-wrapper {
+    // Подпись о том что ссылка скопирована
+    position: relative;
+
+    .copy-notice {
+        position: absolute;
+
+        top: -25px;
+        left: 50%;
+        transform: translateX(-50%);
+
+        background: $color-primary;
+        color: $color-white;
+        font-size: $text-little;
+        font-weight: $text-weight-little;
+        padding: 3px 5px;
+
+        white-space: nowrap;
+        z-index: 10;
+    }
+}
+
+.button-gap {
+    display: flex;
+    gap: 10px;
+}
