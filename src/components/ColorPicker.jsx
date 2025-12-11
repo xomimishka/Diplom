@@ -48,7 +48,24 @@ export default function ColorPicker({ initialColor = '#000000', onColorSelect, o
     whiteGradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
     ctx.fillStyle = whiteGradient;
     ctx.fillRect(0, 0, width, height);
-  }, [hue]);
+
+    // Рисуем индикатор текущей позиции (кружок)
+    const indicatorX = (saturation / 100) * width;
+    const indicatorY = (1 - brightness / 100) * height;
+    
+    // Белый кружок с чёрной обводкой для видимости на любом фоне
+    ctx.strokeStyle = '#000';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(indicatorX, indicatorY, 6, 0, 2 * Math.PI);
+    ctx.stroke();
+    
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.arc(indicatorX, indicatorY, 6, 0, 2 * Math.PI);
+    ctx.stroke();
+  }, [hue, saturation, brightness]);
 
   // Закрывать только при клике вне контейнера: глобальный обработчик (capture)
   useEffect(() => {
