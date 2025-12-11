@@ -16,3 +16,5 @@ export { default as userIcon } from './user.svg';
 export { default as vk } from './vk.svg';
 export { default as x } from './x.svg';
 export { default as Yandex } from './Yandex.svg';
+export { default as ph_caret_up_down } from './ph_caret_up_down.svg';
+export { default as ph_calendar_dots } from './ph_calendar_dots.svg';

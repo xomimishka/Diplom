@@ -49,10 +49,10 @@
     text-align: left;
 }
 
-.long-url {
+ .long-url {
     // Короткая ссылка/Название ссылки
     word-break: break-all;
-    width: 90%;
+    /* width removed to avoid forcing wrapping */
 }
 
 .qr {
@@ -125,6 +125,15 @@
     }
 }
 
+/* Ensure link title (inside .block-title .icons) truncates with ellipsis instead of wrapping */
+.block-title .icons > a {
+    display: block;
+    flex: 0 1 auto;
+    min-width: 0;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    white-space: normal;
+}
 // Нужно для кнопки - Поделиться ссылкой
 .share-container {
     position: relative;
@@ -166,6 +175,12 @@
         white-space: nowrap;
         z-index: 10;
     }
+}
+
+span.text-little-grey {
+  display: block;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .button-gap {

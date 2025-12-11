@@ -56,6 +56,28 @@ export default function HomePage({ user }) {
     }
   };
 
+  const handleRenameLong = async (linkId, newLong) => {
+    try {
+      const res = await axios.put(
+        `http://localhost:5000/links/${user.id}/${linkId}/long`,
+        { long: newLong }
+      );
+
+      if (res.data.success) {
+        setLinks((prev) =>
+          prev.map((l) =>
+            l.id === linkId ? { ...l, long: newLong } : l
+          )
+        );
+      } else {
+        alert(res.data.message || "Ошибка изменения длинной ссылки");
+      }
+    } catch (err) {
+      console.error("Ошибка изменения длинной ссылки:", err);
+    }
+  };
+
+
   // Удаление ссылки
   const handleDelete = async (linkId) => {
     try {
@@ -77,7 +99,7 @@ export default function HomePage({ user }) {
       <h1>Сокращение ссылок</h1>
       <p className="signature">Сделайте вашу ссылку короче и аккуратнее. Меньше символов — больше пользы.</p>
       <LinkShortening user={user} onAdd={handleAddLink} />
-      <LinkList links={links} onDelete={handleDelete} onRename={handleRename} user={user} />
+      <LinkList links={links} onDelete={handleDelete} onRename={handleRename} onRenameLong={handleRenameLong} user={user} />
     </div>
   );
 }

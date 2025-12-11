@@ -65,13 +65,13 @@ $spacing-xl: 50px;
     min-width: min-content;
     white-space: nowrap;
 
-    @if $position ==bottom {
+    @if $position == bottom {
         top: 100%;
         border-top: none;
         border-radius: 0 0 $border-radius-small $border-radius-small;
     }
 
-    @else if $position ==top {
+    @else if $position == top {
         bottom: 100%;
         border-radius: $border-radius-small $border-radius-small $border-radius-small $border-radius-small;
     }
@@ -117,3 +117,11 @@ $spacing-xl: 50px;
         outline: none;
     }
 }
+
+// Breakpoints
+$breakpoint-sm: 480px; // phones
+$breakpoint-md: 768px; // tablets
+$breakpoint-lg: 1024px; // small laptops
+
+// Container
+$container-max-width: 1200px;

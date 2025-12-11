@@ -1,106 +1,140 @@
-import { useState } from 'react';
+// src/components/RedactName.jsx
+import { useState, useEffect } from "react";
 import "../styles/redactname.scss";
 import "../styles/link-shortening.scss";
 import "../styles/link-list.scss";
-import { x } from "../images";
+import { x, radio, radio_active } from "../images";
+import DropdownSelect from "./DropdownSelect";
+import { updateLink } from "../api/linksApi"; // добавь в linksApi.js
 
-export default function RedactName({ link, onClose, onRename }) {
-    const [newTitle, setNewTitle] = useState(link?.title || link?.short || '');
+const months = [
+    "Январь", "Февраль", "Март", "Апрель", "Май", "Июнь",
+    "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"
+];
 
-    const handleClear = () => setNewTitle("");
+export default function RedactName({ link, onClose, user }) {
+    const [newTitle, setNewTitle] = useState(link?.title || link?.short || "");
+    const [newLong, setNewLong] = useState(link?.long || "");
 
-    const isFilled = newTitle.trim().length > 0;
+    const initialFrom = link?.valid_from ? new Date(link.valid_from) : new Date();
+    const initialUntil = link?.valid_until ? new Date(link.valid_until) : null;
+
+    const [fromDay, setFromDay] = useState(initialFrom.getDate());
+    const [fromMonth, setFromMonth] = useState(initialFrom.getMonth());
+    const [fromYear, setFromYear] = useState(initialFrom.getFullYear());
+    const [fromHour, setFromHour] = useState(initialFrom.getHours());
+    const [fromMinute, setFromMinute] = useState(initialFrom.getMinutes());
+
+    const [hasEndDate, setHasEndDate] = useState(Boolean(link?.has_end_date));
+    const [untilDay, setUntilDay] = useState(initialUntil ? initialUntil.getDate() : initialFrom.getDate());
+    const [untilMonth, setUntilMonth] = useState(initialUntil ? initialUntil.getMonth() : initialFrom.getMonth());
+    const [untilYear, setUntilYear] = useState(initialUntil ? initialUntil.getFullYear() : initialFrom.getFullYear());
+    const [untilHour, setUntilHour] = useState(initialUntil ? initialUntil.getHours() : initialFrom.getHours());
+    const [untilMinute, setUntilMinute] = useState(initialUntil ? initialUntil.getMinutes() : initialFrom.getMinutes());
+
+    const fromDaysInMonth = new Date(fromYear, fromMonth + 1, 0).getDate();
+    const untilDaysInMonth = new Date(untilYear, untilMonth + 1, 0).getDate();
+
+    useEffect(() => {
+        if (fromDay > fromDaysInMonth) setFromDay(fromDaysInMonth);
+    }, [fromDay, fromMonth, fromYear, fromDaysInMonth]);
+
+    useEffect(() => {
+        if (untilDay > untilDaysInMonth) setUntilDay(untilDaysInMonth);
+    }, [untilDay, untilMonth, untilYear, untilDaysInMonth]);
 
     if (!link) return null;
 
-    const handleSave = () => {
-        if (newTitle && newTitle.trim()) {
-            onRename(link.id, newTitle);
+    const clearTitle = () => setNewTitle("");
+    const clearLong = () => setNewLong("");
+
+    const handleSave = async () => {
+        const valid_from = new Date(fromYear, fromMonth, fromDay, fromHour, fromMinute);
+        const valid_until = hasEndDate ? new Date(untilYear, untilMonth, untilDay, untilHour, untilMinute) : null;
+
+        const body = {
+            ...(newTitle.trim() ? { title: newTitle.trim() } : {}),
+            ...(newLong.trim() && newLong !== link.long ? { long: newLong.trim() } : {}),
+            valid_from: valid_from.toISOString(),
+            has_end_date: hasEndDate,
+            valid_until: valid_until ? valid_until.toISOString() : null,
+        };
+
+        try {
+            await updateLink(user.id, link.id, body);
             onClose();
+            window.location.reload();
+        } catch (err) {
+            console.error("Ошибка обновления ссылки:", err);
+            alert("Не удалось сохранить изменения");
         }
-    };
-
-    const handleCancel = () => {
-        onClose();
-    };
-
-    const handleShortLinkClick = () => {
-        const shortUrl = `http://localhost:5000/r/${link.short}`;
-        window.open(shortUrl, '_blank');
     };
 
     return (
         <div id="rd-overlay" onClick={onClose}>
             <div id="rd-modal" onClick={(e) => e.stopPropagation()}>
-                <h2>Редактирование названия ссылки</h2>
+                <h2>Редактирование ссылки</h2>
 
-                {/* Поле для редактирования названия */}
                 <div className="input-container">
-                    <input
-                        className="input-shortening"
-                        type="text"
-                        value={newTitle}
-                        onChange={(e) => setNewTitle(e.target.value)}
-                        placeholder="Введите новое название"
-                        maxLength={100}
-                    />
-                    {isFilled && (
-                        <button type="button" className="clear-btn" onClick={handleClear}>
-                            <img src={x} alt="Очистить" />
-                        </button>
-                    )}
+                    <input className="input-shortening" type="text" value={newTitle} onChange={(e) => setNewTitle(e.target.value)} placeholder="Введите название ссылки" maxLength={100} />
+                    {newTitle.trim() && <button type="button" className="clear-btn" onClick={clearTitle}><img src={x} alt="Очистить" /></button>}
                 </div>
 
-                {/* Информация о ссылке */}
                 <div className="link-info">
-                    {link.title && link.title !== "" && (
-                        <div>
-                            <p className="text-primary-black">
-                                Текущее название: {link.title}
-                            </p>
-                        </div>
-                    )}
-                    <p className="text-primary-black">
-                        <a
-                            href={`http://localhost:5000/r/${link.short}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="short-link"
-                            onClick={handleShortLinkClick}
-                        >
-                            http://localhost:5000/r/{link.short}
-                        </a>
-                    </p>
-                    <p className="text-average-grey long-url">
-                        <strong>Оригинальная ссылка:</strong> {link.long}
-                    </p>
-                    <p className="text-average-grey">
-                        <strong>Дата создания:</strong> {link.created_at ? new Date(link.created_at).toLocaleString("ru-RU", {
-                            year: "numeric",
-                            month: "2-digit",
-                            day: "2-digit",
-                            hour: "2-digit",
-                            minute: "2-digit",
-                        }) : "Не указана"}
-                    </p>
-                    <p className="text-average-grey">
-                        <strong>Тип ссылки:</strong> {link.type ? "Публичная" : "Личная"}
-                    </p>
-                    {link.clicks !== undefined && (
-                        <p className="text-average-grey">
-                            <strong>Переходы:</strong> {link.clicks}
-                        </p>
-                    )}
+                    <p className="text-average-black"><a href={`http://localhost:5000/r/${link.short}`} target="_blank" rel="noopener noreferrer" className="short-link">http://localhost:5000/r/{link.short}</a></p>
                 </div>
 
-                {/* Кнопки действий */}
+                <div className="input-container">
+                    <input className="input-shortening" type="text" value={newLong} onChange={(e) => setNewLong(e.target.value)} placeholder="Введите новую длинную ссылку" maxLength={1000} />
+                    {newLong.trim() && <button type="button" className="clear-btn" onClick={clearLong}><img src={x} alt="Очистить" /></button>}
+                </div>
+
+                <div className="link-info">
+                    <p className="text-average-grey long-url">{link.long}</p>
+                    <p className="text-average-grey">{link.type ? "Публичная" : "Личная"} ссылка</p>
+                    {typeof link.clicks !== "undefined" && <p className="text-average-grey"><strong>Переходы:</strong> {link.clicks}</p>}
+                </div>
+
+                {/* Даты */}
+                <div className="link-info">
+                    <p className="text-primary-black">Время действия ссылки</p>
+
+                    {/* Дата начала — всегда редактируема */}
+                    <p className="text-primary-black weight-300">Дата начала действия ссылки</p>
+                    <div className="block-time">
+                        <DropdownSelect options={Array.from({ length: fromDaysInMonth }, (_, i) => i + 1)} value={fromDay} onChange={setFromDay} width="65px" />
+                        <DropdownSelect options={months} value={months[fromMonth]} onChange={(m) => setFromMonth(months.indexOf(m))} width="138px" />
+                        <DropdownSelect options={Array.from({ length: 10 }, (_, i) => new Date().getFullYear() + i)} value={fromYear} onChange={setFromYear} width="105px" />
+                        <DropdownSelect options={Array.from({ length: 24 }, (_, i) => i.toString().padStart(2, "0"))} value={String(fromHour).padStart(2, "0")} onChange={(v) => setFromHour(Number(v))} width="86px" />
+                        <DropdownSelect options={Array.from({ length: 60 }, (_, i) => i.toString().padStart(2, "0"))} value={String(fromMinute).padStart(2, "0")} onChange={(v) => setFromMinute(Number(v))} width="86px" />
+                    </div>
+
+                    {/* Переключатель окончания — включает/выключает поля окончания */}
+                    <div className="block-time" style={{ alignItems: 'center', gap: '12px', marginTop: '12px' }}>
+                        <p className="text-primary-black weight-300">Дата окончания действия ссылки</p>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                            <img
+                                src={hasEndDate ? radio_active : radio}
+                                alt={hasEndDate ? "Включено" : "Выключено"}
+                                style={{ cursor: 'pointer' }}
+                                onClick={() => setHasEndDate(v => !v)}
+                            />
+                            <span style={{ userSelect: 'none' }}>{hasEndDate ? "Включено" : "Выключено"}</span>
+                        </div>
+                    </div>
+
+                    {/* Поля окончания — активны только если hasEndDate === true */}
+                    <div className="block-time" style={{ marginTop: 8 }}>
+                        <DropdownSelect options={Array.from({ length: untilDaysInMonth }, (_, i) => i + 1)} value={untilDay} onChange={setUntilDay} width="65px" disabled={!hasEndDate} />
+                        <DropdownSelect options={months} value={months[untilMonth]} onChange={(m) => setUntilMonth(months.indexOf(m))} width="138px" disabled={!hasEndDate} />
+                        <DropdownSelect options={Array.from({ length: 10 }, (_, i) => new Date().getFullYear() + i)} value={untilYear} onChange={setUntilYear} width="105px" disabled={!hasEndDate} />
+                        <DropdownSelect options={Array.from({ length: 24 }, (_, i) => i.toString().padStart(2, "0"))} value={String(untilHour).padStart(2, "0")} onChange={(v) => setUntilHour(Number(v))} width="86px" disabled={!hasEndDate} />
+                        <DropdownSelect options={Array.from({ length: 60 }, (_, i) => i.toString().padStart(2, "0"))} value={String(untilMinute).padStart(2, "0")} onChange={(v) => setUntilMinute(Number(v))} width="86px" disabled={!hasEndDate} />
+                    </div>
+                </div>
+
                 <div className="block-buttons block-center">
-                    <button
-                        className="text-average-black button-website"
-                        onClick={handleCancel}
-                    >
-                        Отмена
-                    </button>
+                    <button className="text-average-black button-website" onClick={onClose}>Отмена</button>
                     <button
                         className="text-average-black button-website button-save"
                         onClick={handleSave}

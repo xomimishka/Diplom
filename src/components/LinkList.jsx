@@ -7,22 +7,21 @@ import "../styles/global.scss";
 
 import { pen, x, statistics, copy, qr, share, publics, privates, vk, telegram } from "../images";
 
-export default function LinkList({ links = [], onDelete, onRename, user }) {
+export default function LinkList({ links = [], onDelete, user }) {
   const [activeShareMenu, setActiveShareMenu] = useState(null);
   const [activeQR, setActiveQR] = useState(null);
   const [activeRedactName, setActiveRedactName] = useState(null);
   const [activeStatistics, setActiveStatistics] = useState(null);
   const [activeLinkData, setActiveLinkData] = useState(null);
   const [hoveredLinkId, setHoveredLinkId] = useState(null);
-  const shareContainerRefs = useRef({});
   const [copiedLinkId, setCopiedLinkId] = useState(null);
+  const shareContainerRefs = useRef({});
   const listClass = user ? "link-list-home" : "link-list-guest";
 
   const toggleShareMenu = (linkId) => {
     setActiveShareMenu(activeShareMenu === linkId ? null : linkId);
   };
 
-  // закрытие меню при клике вне
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (activeShareMenu !== null) {
@@ -32,7 +31,6 @@ export default function LinkList({ links = [], onDelete, onRename, user }) {
         }
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [activeShareMenu]);
@@ -43,52 +41,24 @@ export default function LinkList({ links = [], onDelete, onRename, user }) {
     setTimeout(() => setCopiedLinkId(null), 2000);
   };
 
-  // Обработчик открытия QR-окна
   const handleQROpen = (link) => {
     setActiveQR(link.qr);
     setActiveLinkData(link);
   };
 
-  // Обработчик закрытия QR-окна
   const handleQRClose = () => {
     setActiveQR(null);
     setActiveLinkData(null);
   };
 
-  // Обработчик открытия редактирования названия
-  const handleRedactNameOpen = (link) => {
-    setActiveRedactName(link);
-  };
+  const handleRedactNameOpen = (link) => setActiveRedactName(link);
+  const handleRedactNameClose = () => setActiveRedactName(null);
 
-  // Обработчик закрытия редактирования названия
-  const handleRedactNameClose = () => {
-    setActiveRedactName(null);
-  };
+  const handleStatisticsOpen = (link) => setActiveStatistics(link);
+  const handleStatisticsClose = () => setActiveStatistics(null);
 
-  // Обработчик открытия статистики
-  const handleStatisticsOpen = (link) => {
-    setActiveStatistics(link);
-  };
-
-  // Обработчик закрытия статистики
-  const handleStatisticsClose = () => {
-    setActiveStatistics(null);
-  };
-
-  // Обработчик сохранения нового названия
-  const handleRename = (linkId, newTitle) => {
-    onRename(linkId, newTitle);
-    handleRedactNameClose();
-  };
-
-  // Обработчики наведения на блок ссылки
-  const handleMouseEnter = (linkId) => {
-    setHoveredLinkId(linkId);
-  };
-
-  const handleMouseLeave = () => {
-    setHoveredLinkId(null);
-  };
+  const handleMouseEnter = (linkId) => setHoveredLinkId(linkId);
+  const handleMouseLeave = () => setHoveredLinkId(null);
 
   if (!links.length) return null;
 
@@ -96,13 +66,12 @@ export default function LinkList({ links = [], onDelete, onRename, user }) {
     <>
       <ul id="link-list" className={listClass}>
         {links.map((link, index) => (
-          <li 
+          <li
             key={link.id}
             onMouseEnter={() => handleMouseEnter(link.id)}
             onMouseLeave={handleMouseLeave}
           >
             <div className="block-link">
-              {/* Левая часть */}
               <div className="block-left">
                 {link.qr && <img className="qr" src={link.qr} alt="qr" onClick={() => handleQROpen(link)} />}
 
@@ -117,58 +86,41 @@ export default function LinkList({ links = [], onDelete, onRename, user }) {
                       {link.title || link.short}
                     </a>
                     {user && (
-                      <p className="btn btn--top" data-tooltip={link.type ? "Публичная ссылка" : "Личная ссылка"}>{link.type ? (<>
-                        <img src={publics} alt="publics" />
-                      </>) : (<>
-                        <img src={privates} alt="privates" />
-                      </>)}</p>)}
+                      <p className="btn btn--top" data-tooltip={link.type ? "Публичная ссылка" : "Личная ссылка"}>
+                        <img src={link.type ? publics : privates} alt={link.type ? "publics" : "privates"} />
+                      </p>
+                    )}
                   </div>
-                  <span className="text-little-grey">{link.long}</span>
 
+                  <span className="text-little-grey">{link.long}</span>
                   <span className="text-little-grey">
-                    {link.created_at
-                      ? new Date(link.created_at).toLocaleString("ru-RU", {
-                        year: "numeric",
-                        month: "2-digit",
-                        day: "2-digit",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })
-                      : ""}
+                    {link.created_at ? new Date(link.created_at).toLocaleString("ru-RU", {
+                      year: "numeric",
+                      month: "2-digit",
+                      day: "2-digit",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    }) : ""}
                   </span>
+
                   <div className={`icons ${hoveredLinkId === link.id ? 'visible' : 'hidden'}`}>
                     <div className="copy-wrapper" style={{ position: "relative" }}>
-                      <button
-                        className="btn"
-                        data-tooltip="Копировать"
-                        onClick={() => handleCopy(link.id, link.short)}
-                      >
+                      <button className="btn" data-tooltip="Копировать" onClick={() => handleCopy(link.id, link.short)}>
                         <img src={copy} alt="copy" />
                       </button>
-                      {copiedLinkId === link.id && (
-                        <span className="copy-notice">Ссылка скопирована!</span>
-                      )}
+                      {copiedLinkId === link.id && <span className="copy-notice">Ссылка скопирована!</span>}
                     </div>
 
                     {user && (
-                      <button
-                        className="btn"
-                        data-tooltip="Изменить название ссылки"
-                        onClick={() => handleRedactNameOpen(link)}
-                      >
+                      <button className="btn" data-tooltip="Изменить название ссылки" onClick={() => handleRedactNameOpen(link)}>
                         <img src={pen} alt="pen" />
                       </button>
                     )}
 
-                    <button
-                      className="btn"
-                      data-tooltip="Настройки QR-кода"
-                      onClick={() => handleQROpen(link)}
-                    >
+                    <button className="btn" data-tooltip="Настройки QR-кода" onClick={() => handleQROpen(link)}>
                       <img src={qr} alt="qr" />
                     </button>
 
-                    {/* Меню - Поделиться ссылкой */}
                     <div className="share-container" ref={(el) => (shareContainerRefs.current[link.id] = el)}>
                       <button
                         className={`btn ${activeShareMenu === link.id ? "active" : ""}`}
@@ -184,9 +136,7 @@ export default function LinkList({ links = [], onDelete, onRename, user }) {
                           <button
                             className="text-average-black weight-400 button-gap"
                             onClick={() => {
-                              const url = `http://localhost:5000/r/${link.short}`;
-                              const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(url)}`;
-                              window.open(shareUrl, '_blank', 'width=600,height=400');
+                              window.open(`https://t.me/share/url?url=${encodeURIComponent(`http://localhost:5000/r/${link.short}`)}`, '_blank', 'width=600,height=400');
                               setActiveShareMenu(null);
                             }}
                           >
@@ -196,9 +146,7 @@ export default function LinkList({ links = [], onDelete, onRename, user }) {
                           <button
                             className="text-average-black weight-400 button-gap"
                             onClick={() => {
-                              const url = `http://localhost:5000/r/${link.short}`;
-                              const shareUrl = `https://vk.com/share.php?url=${encodeURIComponent(url)}`;
-                              window.open(shareUrl, '_blank', 'width=600,height=400');
+                              window.open(`https://vk.com/share.php?url=${encodeURIComponent(`http://localhost:5000/r/${link.short}`)}`, '_blank', 'width=600,height=400');
                               setActiveShareMenu(null);
                             }}
                           >
@@ -212,22 +160,13 @@ export default function LinkList({ links = [], onDelete, onRename, user }) {
                 </div>
               </div>
 
-              {/* Правая часть */}
               {user && (
                 <div className={`button-right ${hoveredLinkId === link.id ? 'visible' : 'hidden'}`}>
-                  <button
-                    className="btn"
-                    data-tooltip="Удалить ссылку"
-                    onClick={() => onDelete(link.id)}
-                  >
+                  <button className="btn" data-tooltip="Удалить ссылку" onClick={() => onDelete(link.id)}>
                     <img src={x} alt="x" />
                   </button>
 
-                  <button 
-                    className="btn"
-                    data-tooltip="Статистика переходов"
-                    onClick={() => handleStatisticsOpen(link)}
-                  >
+                  <button className="btn" data-tooltip="Статистика переходов" onClick={() => handleStatisticsOpen(link)}>
                     <p className="statistics">0<img src={statistics} alt="statistics" /></p>
                   </button>
                 </div>
@@ -236,35 +175,12 @@ export default function LinkList({ links = [], onDelete, onRename, user }) {
 
             {index !== links.length - 1 && <hr />}
           </li>
-        ))
-        }
-      </ul >
+        ))}
+      </ul>
 
-      {/* Модальное окно QR */}
-      {activeQR && (
-        <QRcode
-          qr={activeQR}
-          onClose={handleQRClose}
-          linkData={activeLinkData}
-        />
-      )}
-
-      {/* Модальное окно редактирования названия */}
-      {activeRedactName && (
-        <RedactName
-          link={activeRedactName}
-          onClose={handleRedactNameClose}
-          onRename={handleRename}
-        />
-      )}
-
-      {/* Модальное окно статистики */}
-      {activeStatistics && (
-        <Statistics
-          link={activeStatistics}
-          onClose={handleStatisticsClose}
-        />
-      )}
+      {activeQR && <QRcode qr={activeQR} onClose={handleQRClose} linkData={activeLinkData} />}
+      {activeRedactName && <RedactName link={activeRedactName} user={user} onClose={handleRedactNameClose} />}
+      {activeStatistics && <Statistics link={activeStatistics} onClose={handleStatisticsClose} />}
     </>
   );
 }

@@ -20,6 +20,16 @@ export const deleteLink = createAsyncThunk("links/delete", async ({ userId, link
   return linkId;
 });
 
+// Обновление ссылки
+export const updateLinkInStore = createAsyncThunk(
+  "links/update",
+  async ({ userId, linkId, data }) => {
+    const res = await axios.put(`${API}/links/${userId}/${linkId}`, data);
+    if (!res.data.success) throw new Error(res.data.message);
+    return res.data.link; // вернём обновлённую ссылку
+  }
+);
+
 const linksSlice = createSlice({
   name: "links",
   initialState: { items: [], loading: false, error: null },
@@ -36,6 +46,10 @@ const linksSlice = createSlice({
       })
       .addCase(deleteLink.fulfilled, (state, action) => {
         state.items = state.items.filter(l => l.id !== action.payload);
+      })
+      .addCase(updateLinkInStore.fulfilled, (state, action) => {
+        const idx = state.items.findIndex(l => l.id === action.payload.id);
+        if (idx !== -1) state.items[idx] = action.payload;
       })
       .addMatcher((action) => action.type.endsWith("rejected"), (state, action) => {
         state.loading = false;
