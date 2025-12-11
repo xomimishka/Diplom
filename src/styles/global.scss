@@ -79,17 +79,18 @@ a {
 
     position: absolute;
 
-    background: $color-background-dark;
-    color: $color-white;
-    font-size: $text-little;
-    font-weight: $text-weight-little;
+    background: #1a1a1a;
+    color: white;
+    font-size: 12px;
+    font-weight: 500;
 
     padding: 3px 5px;
-    border-radius: $border-radius-small;
+    border-radius: 4px;
     opacity: 0;
     white-space: nowrap;
-    transition: opacity $transition-fast;
+    transition: opacity 0.2s;
     z-index: 10;
+    pointer-events: none;
 }
 
 .btn {

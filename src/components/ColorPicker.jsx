@@ -203,7 +203,7 @@ export default function ColorPicker({ initialColor = '#000000', onColorSelect, o
       >
         <div className="picker-header">
           <p className="text-primary-black">Выберите цвет</p>
-          <button className="close-btn" onClick={onClose}>✕</button>
+          <button className="close-btn" data-tooltip="Закрыть" onClick={onClose}>✕</button>
         </div>
 
         {/* Основной градиент */}
