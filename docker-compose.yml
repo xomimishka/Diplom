@@ -1,0 +1,38 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: postgres_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: motherlode
+      POSTGRES_DB: ShortLinks
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./server/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  server:
+    build: ./server
+    container_name: diplom_server
+    environment:
+      PG_USER: postgres
+      PG_PASSWORD: motherlode
+      PG_DATABASE: ShortLinks
+      PG_HOST: postgres
+      PG_PORT: 5432
+    ports:
+      - "5000:5000"
+    depends_on:
+      - postgres
+
+  client:
+    build: .
+    container_name: diplom_client
+    ports:
+      - "3000:80"
+    depends_on:
+      - server
+
+volumes:
+  postgres_data:
