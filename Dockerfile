@@ -1,4 +1,5 @@
 FROM node:20-alpine AS build
+LABEL org.opencontainers.image.source=https://github.com/xomimishka/Diplom
 
 WORKDIR /app
 
