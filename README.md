@@ -59,17 +59,6 @@ docker-compose up --build
 ---
 
 
-## Доступ к приложению
-
-После запуска проекта:
-
-Frontend: http://localhost:3000
-Backend API: http://localhost:5000
-PostgreSQL: localhost:5432
-
----
-
-
 ## Данные базы данных
 
 User: postgres
