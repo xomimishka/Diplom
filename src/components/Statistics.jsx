@@ -94,7 +94,7 @@ export default function Statistics({ link, onClose }) {
                 <tbody>
                   {stats.countries.map((item, i) => (
                     <tr key={i}>
-                      <td>{item.name || "Россия"}</td>
+                      <td>Россия</td>
                       <td>{item.count}</td>
                       <td>{((item.count / stats.total) * 100).toFixed(1)}%</td>
                     </tr>
@@ -119,7 +119,7 @@ export default function Statistics({ link, onClose }) {
                 <tbody>
                   {stats.cities.map((item, i) => (
                     <tr key={i}>
-                      <td>{item.name || "Таганрог"}</td>
+                      <td>Таганрог</td>
                       <td>{item.count}</td>
                       <td>{((item.count / stats.total) * 100).toFixed(1)}%</td>
                     </tr>

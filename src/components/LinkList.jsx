@@ -93,27 +93,7 @@ export default function LinkList({ links = [], onDelete, user }) {
                   </div>
 
                   <span className="text-little-grey">{link.long}</span>
-                  <span className="text-little-grey">
-                    {link.created_at ? new Date(link.created_at).toLocaleString("ru-RU", {
-                      year: "numeric",
-                      month: "2-digit",
-                      day: "2-digit",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    }) : ""}
-                  </span>
                   
-                  {/* Индикатор статуса проверки ссылки */}
-                  {link.is_active !== undefined && (
-                    <span className={`link-status ${link.is_active ? 'active' : 'inactive'}`}>
-                      {link.is_active ? '✓ Безопасная ссылка' : '✗ Небезопасная ссылка'}
-                    </span>
-                  )}
-                  {link.last_checked && (
-                    <span className="text-little-grey">
-                      Проверено: {new Date(link.last_checked).toLocaleString("ru-RU")}
-                    </span>
-                  )}
 
                   {/* Срок действия ссылки */}
                   <span className={`link-status ${link.has_end_date && link.valid_until && new Date(link.valid_until) < new Date() ? 'inactive' : link.has_end_date ? 'active' : ''}`}>

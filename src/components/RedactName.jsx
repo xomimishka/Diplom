@@ -93,9 +93,36 @@ export default function RedactName({ link, onClose, user }) {
                     <p className="text-average-grey long-url">{link.long}</p>
                     <p className="text-average-grey">{link.type ? "Публичная" : "Личная"} ссылка</p>
                     {typeof link.clicks !== "undefined" && <p className="text-average-grey"><strong>Переходы:</strong> {link.clicks}</p>}
+                    
+                    {/* Статус безопасности ссылки */}
+                    <p className="text-average-grey">
+                        <strong>Безопасность:</strong>{" "}
+                        <span style={{ color: link.is_active ? "#2e7d32" : "#c62828", fontWeight: link.is_active ? "normal" : "bold" }}>
+                            {link.is_active ? "✓ Безопасная" : "✗ Небезопасная"}
+                        </span>
+                    </p>
+                    
+                    {/* Статус действия ссылки */}
+                    <p className="text-average-grey">
+                        <strong>Статус:</strong>{" "}
+                        {link.is_active === false ? (
+                            <span style={{ color: "#c62828", fontWeight: "bold" }}>🔒 Заблокирована</span>
+                        ) : link.has_end_date && link.valid_until && new Date(link.valid_until) < new Date() ? (
+                            <span style={{ color: "#f57c00", fontWeight: "bold" }}>⚠ Срок действия истёк</span>
+                        ) : link.has_end_date && link.valid_until ? (
+                            <span style={{ color: "#1976d2" }}>Действует до {new Date(link.valid_until).toLocaleString("ru-RU", { year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" })}</span>
+                        ) : (
+                            <span style={{ color: "#2e7d32" }}>∞ Бессрочная</span>
+                        )}
+                    </p>
+                    
+                    {link.last_checked && (
+                        <p className="text-average-grey" style={{ fontSize: "0.85em", color: "#757575" }}>
+                            Последняя проверка: {new Date(link.last_checked).toLocaleString("ru-RU", { year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" })}
+                        </p>
+                    )}
+                    <br />
                 </div>
-
-                {/* Даты */}
                 <div className="link-info">
                     <p className="text-primary-black">Время действия ссылки</p>
 
