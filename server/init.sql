@@ -17,7 +17,10 @@ CREATE TABLE IF NOT EXISTS public.links
     qr TEXT,
     valid_from TIMESTAMPTZ,
     valid_until TIMESTAMPTZ,
-    has_end_date BOOLEAN DEFAULT false
+    has_end_date BOOLEAN DEFAULT false,
+    is_active BOOLEAN DEFAULT true,
+    last_checked TIMESTAMPTZ,
+    check_status VARCHAR(50) DEFAULT 'pending'
 );
 
 CREATE INDEX IF NOT EXISTS idx_short

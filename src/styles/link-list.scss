@@ -187,3 +187,25 @@ span.text-little-grey {
     display: flex;
     gap: 10px;
 }
+
+// Стили для индикатора статуса проверки ссылок
+.link-status {
+    display: inline-block;
+    font-size: $text-little;
+    font-weight: $text-weight-little;
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin-top: 4px;
+    
+    &.active {
+        color: #2e7d32;
+        background-color: #e8f5e9;
+        border: 1px solid #a5d6a7;
+    }
+    
+    &.inactive {
+        color: #c62828;
+        background-color: #ffebee;
+        border: 1px solid #ef9a9a;
+    }
+}

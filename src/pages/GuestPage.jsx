@@ -39,7 +39,7 @@ export default function GuestPage() {
 
   return (
     <div>
-      <h1>Сокращение ссылок</h1>
+      <h1>Безопасный сервис коротких ссылок</h1>
       <p className="signature">Сделайте вашу ссылку короче и аккуратнее. Меньше символов — больше пользы.</p>
       <LinkShortening onAdd={handleAddLink} guestMode />
       <LinkList links={links} />

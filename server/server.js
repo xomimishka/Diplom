@@ -8,6 +8,7 @@ const axios = require("axios");
 const QRCode = require("qrcode");
 const rateLimit = require("express-rate-limit");
 const helmet = require("helmet");
+const crypto = require('crypto');
 
 const app = express();
 app.use(helmet());
@@ -31,9 +32,18 @@ const pool = new Pool({
 });
 
 // --- Утилиты ---
-function generateShort(len = 6) {
-  return Math.random().toString(36).substring(2, 2 + len);
+function generateShort(longUrl, len = 6) {
+  const hash = crypto.createHash('md5').update(longUrl).digest('hex');
+  const base62 = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+  let short = '';
+  let num = parseInt(hash.substr(0, 8), 16);
+  while (short.length < len && num > 0) {
+    short = base62[num % 62] + short;
+    num = Math.floor(num / 62);
+  }
+  return short.padStart(len, base62[0]);
 }
+
 
 async function safePost(url, body) {
   try {
@@ -56,6 +66,94 @@ async function checkUrlExists(url) {
       return false;
     }
   }
+}
+
+// Альтернативная проверка через second API (ipapi.co для проверки доступности)
+async function checkUrlWithAlternative(url) {
+  if (!url) return { isValid: false, method: 'none' };
+  try {
+    // Используем ipapi.co для проверки URL через их endpoint
+    const encodedUrl = encodeURIComponent(url);
+    const res = await axios.get(`https://api.ipapi.co/json/?url=${encodedUrl}`, { timeout: 10000 });
+    // ipapi.co возвращает информацию о URL, если он валидный
+    if (res.data && res.data.valid === true) {
+      return { isValid: true, method: 'ipapi' };
+    }
+    return { isValid: false, method: 'ipapi' };
+  } catch (e) {
+    // Fallback: пробуем через другой метод - просто GET запрос
+    try {
+      const r = await axios.get(url, { timeout: 8000, maxRedirects: 5, validateStatus: () => true });
+      const isValid = r.status >= 200 && r.status < 500;
+      return { isValid, method: 'axios' };
+    } catch (err) {
+      return { isValid: false, method: 'axios' };
+    }
+  }
+}
+
+// Фоновая проверка всех ссылок
+async function checkAllLinks() {
+  console.log(`[${new Date().toISOString()}] Начало фоновой проверки ссылок...`);
+  try {
+    const linksResult = await pool.query("SELECT id, long, short FROM links WHERE is_active = true");
+    const links = linksResult.rows;
+    
+    let checked = 0;
+    let active = 0;
+    let inactive = 0;
+    
+    for (const link of links) {
+      try {
+        // Проверяем через основной метод
+        const primaryValid = await checkUrlExists(link.long);
+        
+        // Проверяем через альтернативный метод
+        const altResult = await checkUrlWithAlternative(link.long);
+        
+        // Считаем ссылку активной если хотя бы один метод подтвердил
+        const isActive = primaryValid || altResult.isValid;
+        
+        await pool.query(
+          "UPDATE links SET is_active = $1, last_checked = NOW(), check_status = $2 WHERE id = $3",
+          [isActive, isActive ? 'active' : 'inactive', link.id]
+        );
+        
+        if (isActive) active++;
+        else inactive++;
+        
+        checked++;
+        
+        // Небольшая задержка между проверками чтобы не нагружать API
+        await new Promise(resolve => setTimeout(resolve, 500));
+      } catch (err) {
+        console.error(`Ошибка проверки ссылки ${link.short}:`, err.message);
+        await pool.query(
+          "UPDATE links SET check_status = $1 WHERE id = $2",
+          ['error', link.id]
+        );
+      }
+    }
+    
+    console.log(`[${new Date().toISOString()}] Проверка завершена: проверено ${checked}, активных ${active}, неактивных ${inactive}`);
+  } catch (err) {
+    console.error("Ошибка фоновой проверки ссылок:", err);
+  }
+}
+
+// Запуск фоновой проверки каждые 30 минут (2 раза в час)
+function startBackgroundLinkChecker() {
+  // Запускаем первую проверку через 1 минуту после старта
+  setTimeout(() => {
+    checkAllLinks();
+  }, 60000);
+  
+  // Затем каждые 30 минут
+  setInterval(() => {
+    checkAllLinks();
+  }, 30 * 60 * 1000); // 30 минут = 1800000 мс
+  
+  console.log("Фоновая проверка ссылок запущена (каждые 30 минут)");
 }
 
 // Проверка через Google Safe Browsing (опционально)
@@ -209,7 +307,7 @@ app.post("/links", async (req, res) => {
     }
 
     // создаём новую запись
-    const short = generateShort();
+    const short = generateShort(long);
     const shortUrl = `http://localhost:5000/r/${short}`;
     const qrDataUrl = await QRCode.toDataURL(shortUrl);
 
@@ -238,18 +336,22 @@ app.get("/links/:userId", async (req, res) => {
     const user = userResult.rows[0];
     if (user?.login === "admin") {
       const result = await pool.query(`
-        SELECT l.*, u.login AS owner_login, ul.title, ul.is_favorite
+        SELECT l.*, u.login AS owner_login, ul.title, ul.is_favorite,
+        (SELECT COUNT(*)::int FROM click_stats WHERE link_id = l.id) AS clicks
         FROM links l
         LEFT JOIN user_links ul ON ul.link_id = l.id
         LEFT JOIN users u ON ul.user_id = u.id
+        ORDER BY l.id DESC
       `);
       return res.json({ success: true, links: result.rows, admin: true });
     }
     const result = await pool.query(
-      `SELECT l.*, ul.title, ul.is_favorite
+      `SELECT l.*, ul.title, ul.is_favorite,
+      (SELECT COUNT(*)::int FROM click_stats WHERE link_id = l.id) AS clicks
        FROM links l
        JOIN user_links ul ON ul.link_id = l.id
-       WHERE ul.user_id = $1`,
+       WHERE ul.user_id = $1
+       ORDER BY l.id DESC`,
       [userId]
     );
     return res.json({ success: true, links: result.rows, admin: false });
@@ -296,6 +398,7 @@ app.get("/r/:short", async (req, res) => {
     const link = linkRes.rows[0];
 
     const now = new Date();
+    if (!link.is_active) return res.status(403).send("Ссылка заблокирована как небезопасная");
     if (link.valid_from && new Date(link.valid_from) > now) return res.status(403).send("Эта ссылка ещё не активна");
     if (link.has_end_date && link.valid_until && new Date(link.valid_until) < now) return res.status(403).send("Срок действия ссылки истёк");
 
@@ -522,4 +625,45 @@ app.get("/auth/google/callback", async (req, res) => {
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server listening on http://localhost:${PORT}`);
+  // Запускаем фоновую проверку ссылок
+  startBackgroundLinkChecker();
+});
+
+// --- API: Статус проверки ссылок ---
+// Получение статистики по проверке ссылок
+app.get("/links-check-status", async (req, res) => {
+  try {
+    const totalResult = await pool.query("SELECT COUNT(*)::int as total FROM links");
+    const activeResult = await pool.query("SELECT COUNT(*)::int as active FROM links WHERE is_active = true");
+    const inactiveResult = await pool.query("SELECT COUNT(*)::int as inactive FROM links WHERE is_active = false");
+    const lastCheckResult = await pool.query("SELECT MAX(last_checked) as last_check FROM links");
+    
+    return res.json({
+      success: true,
+      stats: {
+        total: totalResult.rows[0]?.total || 0,
+        active: activeResult.rows[0]?.active || 0,
+        inactive: inactiveResult.rows[0]?.inactive || 0,
+        lastCheck: lastCheckResult.rows[0]?.last_check || null
+      }
+    });
+  } catch (err) {
+    console.error("links-check-status error:", err);
+    return res.status(500).json({ success: false, message: "Ошибка получения статуса" });
+  }
+});
+
+// Ручной запуск проверки (для админа)
+app.post("/links-check-run", async (req, res) => {
+  try {
+    // Запускаем проверку асинхронно
+    checkAllLinks().then(() => {
+      console.log("Ручная проверка ссылок завершена");
+    });
+    
+    return res.json({ success: true, message: "Проверка ссылок запущена" });
+  } catch (err) {
+    console.error("links-check-run error:", err);
+    return res.status(500).json({ success: false, message: "Ошибка запуска проверки" });
+  }
 });

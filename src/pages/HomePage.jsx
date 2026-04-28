@@ -96,7 +96,7 @@ export default function HomePage({ user }) {
 
   return (
     <div className="home-page">
-      <h1>Сокращение ссылок</h1>
+      <h1>Безопасный сервис коротких ссылок</h1>
       <p className="signature">Сделайте вашу ссылку короче и аккуратнее. Меньше символов — больше пользы.</p>
       <LinkShortening user={user} onAdd={handleAddLink} />
       <LinkList links={links} onDelete={handleDelete} onRename={handleRename} onRenameLong={handleRenameLong} user={user} />

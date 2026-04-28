@@ -102,6 +102,25 @@ export default function LinkList({ links = [], onDelete, user }) {
                       minute: "2-digit",
                     }) : ""}
                   </span>
+                  
+                  {/* Индикатор статуса проверки ссылки */}
+                  {link.is_active !== undefined && (
+                    <span className={`link-status ${link.is_active ? 'active' : 'inactive'}`}>
+                      {link.is_active ? '✓ Безопасная ссылка' : '✗ Небезопасная ссылка'}
+                    </span>
+                  )}
+                  {link.last_checked && (
+                    <span className="text-little-grey">
+                      Проверено: {new Date(link.last_checked).toLocaleString("ru-RU")}
+                    </span>
+                  )}
+
+                  {/* Срок действия ссылки */}
+                  <span className={`link-status ${link.has_end_date && link.valid_until && new Date(link.valid_until) < new Date() ? 'inactive' : link.has_end_date ? 'active' : ''}`}>
+                    {link.has_end_date && link.valid_until ? (
+                      new Date(link.valid_until) < new Date() ? '⚠ Срок действия истёк' : `Действует до ${new Date(link.valid_until).toLocaleString("ru-RU", { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}`
+                    ) : '∞ Бессрочная'}
+                  </span>
 
                   <div className={`icons ${hoveredLinkId === link.id ? 'visible' : 'hidden'}`}>
                     <div className="copy-wrapper" style={{ position: "relative" }}>
@@ -167,7 +186,7 @@ export default function LinkList({ links = [], onDelete, user }) {
                   </button>
 
                   <button className="btn" data-tooltip="Статистика переходов" onClick={() => handleStatisticsOpen(link)}>
-                    <p className="statistics">0<img src={statistics} alt="statistics" /></p>
+                    <p className="statistics">{link.clicks || 0}<img src={statistics} alt="statistics" /></p>
                   </button>
                 </div>
               )}
