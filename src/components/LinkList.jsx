@@ -95,12 +95,14 @@ export default function LinkList({ links = [], onDelete, user }) {
                   <span className="text-little-grey">{link.long}</span>
                   
 
-                  {/* Срок действия ссылки */}
-                  <span className={`link-status ${link.has_end_date && link.valid_until && new Date(link.valid_until) < new Date() ? 'inactive' : link.has_end_date ? 'active' : ''}`}>
-                    {link.has_end_date && link.valid_until ? (
-                      new Date(link.valid_until) < new Date() ? '⚠ Срок действия истёк' : `Действует до ${new Date(link.valid_until).toLocaleString("ru-RU", { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}`
-                    ) : '∞ Бессрочная'}
-                  </span>
+                  {/* Срок действия ссылки - только для личных ссылок */}
+                  {link.type === false && (
+                    <span className={`link-status ${link.has_end_date && link.valid_until && new Date(link.valid_until) < new Date() ? 'inactive' : link.has_end_date ? 'active' : ''}`}>
+                      {link.has_end_date && link.valid_until ? (
+                        new Date(link.valid_until) < new Date() ? '⚠ Срок действия истёк' : `Действует до ${new Date(link.valid_until).toLocaleString("ru-RU", { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}`
+                      ) : '∞ Бессрочная'}
+                    </span>
+                  )}
 
                   <div className={`icons ${hoveredLinkId === link.id ? 'visible' : 'hidden'}`}>
                     <div className="copy-wrapper" style={{ position: "relative" }}>
