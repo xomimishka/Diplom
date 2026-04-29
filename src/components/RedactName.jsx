@@ -83,12 +83,12 @@ export default function RedactName({ link, onClose, user }) {
                 <div className="link-info">
                     <p className="text-average-black"><a href={`http://localhost:5000/r/${link.short}`} target="_blank" rel="noopener noreferrer" className="short-link">http://localhost:5000/r/{link.short}</a></p>
                 </div>
-
-                <div className="input-container">
-                    <input className="input-shortening" type="text" value={newLong} onChange={(e) => setNewLong(e.target.value)} placeholder="Введите новую длинную ссылку" maxLength={1000} />
-                    {newLong.trim() && <button type="button" className="clear-btn" onClick={clearLong}><img src={x} alt="Очистить" /></button>}
-                </div>
-
+                {link.type === false && (
+                    <div className="input-container">
+                        <input className="input-shortening" type="text" value={newLong} onChange={(e) => setNewLong(e.target.value)} placeholder="Введите новую длинную ссылку" maxLength={1000} />
+                        {newLong.trim() && <button type="button" className="clear-btn" onClick={clearLong}><img src={x} alt="Очистить" /></button>}
+                    </div>
+                )}
                 <div className="link-info">
                     <p className="text-average-grey long-url">{link.long}</p>
                     <p className="text-average-grey">{link.type ? "Публичная" : "Личная"} ссылка</p>
