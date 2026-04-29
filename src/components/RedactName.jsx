@@ -93,6 +93,11 @@ export default function RedactName({ link, onClose, user }) {
                     <p className="text-average-grey long-url">{link.long}</p>
                     <p className="text-average-grey">{link.type ? "Публичная" : "Личная"} ссылка</p>
                     {typeof link.clicks !== "undefined" && <p className="text-average-grey"><strong>Переходы:</strong> {link.clicks}</p>}
+                    {link.owner_login && (
+                        <p className="text-average-grey">
+                            <strong>Автор:</strong> {link.owner_login}
+                        </p>
+                    )}
 
                     {/* Статус безопасности ссылки - только для личных ссылок */}
                     {link.type === false && (
