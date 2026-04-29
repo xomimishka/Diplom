@@ -44,19 +44,6 @@ export default function Statistics({ link, onClose }) {
           </p>
 
           <p className="text-average-grey">
-            <strong>Дата создания:</strong>{" "}
-            {link.created_at
-              ? new Date(link.created_at).toLocaleString("ru-RU", {
-                  year: "numeric",
-                  month: "2-digit",
-                  day: "2-digit",
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })
-              : "Не указана"}
-          </p>
-
-          <p className="text-average-grey">
             <strong>Тип ссылки:</strong> {link.type ? "Публичная" : "Личная"}
           </p>
 
@@ -76,56 +63,55 @@ export default function Statistics({ link, onClose }) {
         {stats && (
           <div className="stats-section">
 
-            <h3>Всего переходов: {stats.total || 0}</h3>
+            {(!stats.countries || stats.countries.length === 0) ? (
+              <h3>Нет данных</h3>) : (<h3>География</h3>)}
 
             {/* ===== Страны ===== */}
-            <h4>Статистика по странам</h4>
             {(!stats.countries || stats.countries.length === 0) ? (
-              <p className="text-average-grey">Нет данных</p>
+              <></>
             ) : (
-              <table className="stats-table">
-                <thead>
-                  <tr>
-                    <th>Страна</th>
-                    <th>Переходы</th>
-                    <th>%</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {stats.countries.map((item, i) => (
-                    <tr key={i}>
-                      <td>Россия</td>
-                      <td>{item.count}</td>
-                      <td>{((item.count / stats.total) * 100).toFixed(1)}%</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+              <div className="geo-block">
+                <div className="geo-header">
+                  <span>Страна</span>
+                  <span>Количество</span>
+                </div>
+
+                {stats.countries.map((item, i) => (
+                  <div className="geo-row" key={i}>
+                    <div className="geo-left">
+                      <span className="dot" />
+                      <span>Россия</span>
+                    </div>
+                    <div className="geo-right">
+                      {((item.count / stats.total) * 100).toFixed(1)}%
+                    </div>
+                  </div>
+                ))}
+              </div>
             )}
 
             {/* ===== Города ===== */}
-            <h4>Статистика по городам</h4>
             {(!stats.cities || stats.cities.length === 0) ? (
-              <p className="text-average-grey">Нет данных</p>
+              <></>
             ) : (
-              <table className="stats-table">
-                <thead>
-                  <tr>
-                    <th>Город</th>
-                    <th>Переходы</th>
-                    <th>%</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {stats.cities.map((item, i) => (
-                    <tr key={i}>
-                      <td>Таганрог</td>
-                      <td>{item.count}</td>
-                      <td>{((item.count / stats.total) * 100).toFixed(1)}%</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+              <div className="geo-block">
+                <div className="geo-header">
+                  <span>Город</span>
+                  <span>Количество</span>
+                </div>
+
+                {stats.cities.map((item, i) => (
+                  <div className="geo-row" key={i}>
+                    <div className="geo-left">
+                      <span className="dot" />
+                      <span>Таганрог</span>
+                    </div>
+                    <div className="geo-right">
+                      {((item.count / stats.total) * 100).toFixed(1)}%
+                    </div>
+                  </div>
+                ))}
+              </div>
             )}
 
           </div>

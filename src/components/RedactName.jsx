@@ -93,17 +93,10 @@ export default function RedactName({ link, onClose, user }) {
                     <p className="text-average-grey long-url">{link.long}</p>
                     <p className="text-average-grey">{link.type ? "Публичная" : "Личная"} ссылка</p>
                     {typeof link.clicks !== "undefined" && <p className="text-average-grey"><strong>Переходы:</strong> {link.clicks}</p>}
-                    
+
                     {/* Статус безопасности ссылки - только для личных ссылок */}
                     {link.type === false && (
                         <>
-                            <p className="text-average-grey">
-                                <strong>Безопасность:</strong>{" "}
-                                <span style={{ color: link.is_active ? "#2e7d32" : "#c62828", fontWeight: link.is_active ? "normal" : "bold" }}>
-                                    {link.is_active ? "✓ Безопасная" : "✗ Небезопасная"}
-                                </span>
-                            </p>
-                            
                             {/* Статус действия ссылки - только для личных ссылок */}
                             <p className="text-average-grey">
                                 <strong>Статус:</strong>{" "}
@@ -117,57 +110,63 @@ export default function RedactName({ link, onClose, user }) {
                                     <span style={{ color: "#2e7d32" }}>∞ Бессрочная</span>
                                 )}
                             </p>
-                            
-                            {link.last_checked && (
-                                <p className="text-average-grey" style={{ fontSize: "0.85em", color: "#757575" }}>
-                                    Последняя проверка: {new Date(link.last_checked).toLocaleString("ru-RU", { year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" })}
-                                </p>
-                            )}
                         </>
                     )}
+                    <p className="text-average-grey">
+                        <strong>Безопасность:</strong>{" "}
+                        <span style={{ color: link.is_active ? "#2e7d32" : "#c62828", fontWeight: link.is_active ? "normal" : "bold" }}>
+                            {link.is_active ? "✓ Безопасная" : "✗ Небезопасная"}
+                        </span>
+                    </p>
+                    {link.last_checked && (
+                        <p className="text-average-grey" style={{ fontSize: "0.85em", color: "#757575" }}>
+                            Последняя проверка: {new Date(link.last_checked).toLocaleString("ru-RU", { year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" })}
+                        </p>
+                    )}
+
                 </div>
-                
+
                 {/* Время действия ссылки - только для личных ссылок */}
                 {link.type === false && (
-                <div className="link-info">
-                    <br />
-                    <p className="text-primary-black">Время действия ссылки</p>
+                    <div className="link-info">
+                        <br />
+                        <p className="text-primary-black">Время действия ссылки</p>
 
-                    {/* Дата начала — всегда редактируема */}
-                    <p className="text-primary-black weight-300">Дата начала действия ссылки</p>
-                    <div className="block-time">
-                        <DropdownSelect options={Array.from({ length: fromDaysInMonth }, (_, i) => i + 1)} value={fromDay} onChange={setFromDay} width="65px" />
-                        <DropdownSelect options={months} value={months[fromMonth]} onChange={(m) => setFromMonth(months.indexOf(m))} width="138px" />
-                        <DropdownSelect options={Array.from({ length: 10 }, (_, i) => new Date().getFullYear() + i)} value={fromYear} onChange={setFromYear} width="105px" />
-                        <DropdownSelect options={Array.from({ length: 24 }, (_, i) => i.toString().padStart(2, "0"))} value={String(fromHour).padStart(2, "0")} onChange={(v) => setFromHour(Number(v))} width="86px" />
-                        <DropdownSelect options={Array.from({ length: 60 }, (_, i) => i.toString().padStart(2, "0"))} value={String(fromMinute).padStart(2, "0")} onChange={(v) => setFromMinute(Number(v))} width="86px" />
-                    </div>
+                        {/* Дата начала — всегда редактируема */}
+                        <p className="text-primary-black weight-300">Дата начала действия ссылки</p>
+                        <div className="block-time">
+                            <DropdownSelect options={Array.from({ length: fromDaysInMonth }, (_, i) => i + 1)} value={fromDay} onChange={setFromDay} width="65px" />
+                            <DropdownSelect options={months} value={months[fromMonth]} onChange={(m) => setFromMonth(months.indexOf(m))} width="138px" />
+                            <DropdownSelect options={Array.from({ length: 10 }, (_, i) => new Date().getFullYear() + i)} value={fromYear} onChange={setFromYear} width="105px" />
+                            <DropdownSelect options={Array.from({ length: 24 }, (_, i) => i.toString().padStart(2, "0"))} value={String(fromHour).padStart(2, "0")} onChange={(v) => setFromHour(Number(v))} width="86px" />
+                            <DropdownSelect options={Array.from({ length: 60 }, (_, i) => i.toString().padStart(2, "0"))} value={String(fromMinute).padStart(2, "0")} onChange={(v) => setFromMinute(Number(v))} width="86px" />
+                        </div>
 
-                    {/* Переключатель окончания — включает/выключает поля окончания */}
-                    <div className="block-time" style={{ alignItems: 'center', gap: '12px', marginTop: '12px' }}>
-                        <p className="text-primary-black weight-300">Дата окончания действия ссылки</p>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                            <img
-                                src={hasEndDate ? radio_active : radio}
-                                alt={hasEndDate ? "Включено" : "Выключено"}
-                                style={{ cursor: 'pointer' }}
-                                onClick={() => setHasEndDate(v => !v)}
-                            />
-                            <span style={{ userSelect: 'none' }}>{hasEndDate ? "Включено" : "Выключено"}</span>
+                        {/* Переключатель окончания — включает/выключает поля окончания */}
+                        <div className="block-time" style={{ alignItems: 'center', gap: '12px', marginTop: '12px' }}>
+                            <p className="text-primary-black weight-300">Дата окончания действия ссылки</p>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                <img
+                                    src={hasEndDate ? radio_active : radio}
+                                    alt={hasEndDate ? "Включено" : "Выключено"}
+                                    style={{ cursor: 'pointer' }}
+                                    onClick={() => setHasEndDate(v => !v)}
+                                />
+                                <span style={{ userSelect: 'none' }}>{hasEndDate ? "Включено" : "Выключено"}</span>
+                            </div>
+                        </div>
+
+                        {/* Поля окончания — активны только если hasEndDate === true */}
+                        <div className="block-time" style={{ marginTop: 8 }}>
+                            <DropdownSelect options={Array.from({ length: untilDaysInMonth }, (_, i) => i + 1)} value={untilDay} onChange={setUntilDay} width="65px" disabled={!hasEndDate} />
+                            <DropdownSelect options={months} value={months[untilMonth]} onChange={(m) => setUntilMonth(months.indexOf(m))} width="138px" disabled={!hasEndDate} />
+                            <DropdownSelect options={Array.from({ length: 10 }, (_, i) => new Date().getFullYear() + i)} value={untilYear} onChange={setUntilYear} width="105px" disabled={!hasEndDate} />
+                            <DropdownSelect options={Array.from({ length: 24 }, (_, i) => i.toString().padStart(2, "0"))} value={String(untilHour).padStart(2, "0")} onChange={(v) => setUntilHour(Number(v))} width="86px" disabled={!hasEndDate} />
+                            <DropdownSelect options={Array.from({ length: 60 }, (_, i) => i.toString().padStart(2, "0"))} value={String(untilMinute).padStart(2, "0")} onChange={(v) => setUntilMinute(Number(v))} width="86px" disabled={!hasEndDate} />
                         </div>
                     </div>
-
-                    {/* Поля окончания — активны только если hasEndDate === true */}
-                    <div className="block-time" style={{ marginTop: 8 }}>
-                        <DropdownSelect options={Array.from({ length: untilDaysInMonth }, (_, i) => i + 1)} value={untilDay} onChange={setUntilDay} width="65px" disabled={!hasEndDate} />
-                        <DropdownSelect options={months} value={months[untilMonth]} onChange={(m) => setUntilMonth(months.indexOf(m))} width="138px" disabled={!hasEndDate} />
-                        <DropdownSelect options={Array.from({ length: 10 }, (_, i) => new Date().getFullYear() + i)} value={untilYear} onChange={setUntilYear} width="105px" disabled={!hasEndDate} />
-                        <DropdownSelect options={Array.from({ length: 24 }, (_, i) => i.toString().padStart(2, "0"))} value={String(untilHour).padStart(2, "0")} onChange={(v) => setUntilHour(Number(v))} width="86px" disabled={!hasEndDate} />
-                        <DropdownSelect options={Array.from({ length: 60 }, (_, i) => i.toString().padStart(2, "0"))} value={String(untilMinute).padStart(2, "0")} onChange={(v) => setUntilMinute(Number(v))} width="86px" disabled={!hasEndDate} />
-                    </div>
-                </div>
                 )}
-                
+
                 <div className="block-buttons block-center">
                     <button className="text-average-black button-website" onClick={onClose}>Отмена</button>
                     <button

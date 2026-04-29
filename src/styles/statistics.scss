@@ -95,3 +95,46 @@
 
     
 }
+
+.stats-section {
+    margin-top: 30px;
+}
+
+.geo-block {
+    margin-top: 15px;
+    border-bottom: 1px solid $color-grey-header;
+    padding-bottom: 15px;
+}
+
+.geo-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    color: $color-grey;
+    margin-bottom: 10px;
+}
+
+.geo-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+}
+
+.geo-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.dot {
+    width: 10px;
+    height: 10px;
+    background-color: $color-primary;
+    border-radius: 50%;
+}
+
+.geo-right {
+    font-size: 14px;
+    color: black;
+}
